@@ -1,2 +1,3 @@
-import("release.gn")
+import("electron_release.gn")
+
 v8_enable_i18n_support = false

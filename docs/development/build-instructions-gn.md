@@ -105,7 +105,7 @@ $ cd src
 $ export CHROMIUM_BUILDTOOLS_PATH=`pwd`/buildtools
 # this next line is needed only if building with sccache
 $ export GN_EXTRA_ARGS="${GN_EXTRA_ARGS} cc_wrapper=\"${PWD}/electron/external_binaries/sccache\""
-$ gn gen out/Debug --args="import(\"//electron/build/args/debug.gn\") $GN_EXTRA_ARGS"
+$ gn gen out/Debug --args="import(\"//electron/build/args/electron_debug.gn\") $GN_EXTRA_ARGS"
 ```
 
 This will generate a build directory `out/Debug` under `src/` with
@@ -121,7 +121,7 @@ out/Debug --list`.
 Electron:**
 
 ```sh
-$ gn gen out/Debug --args="import(\"//electron/build/args/debug.gn\") $GN_EXTRA_ARGS"
+$ gn gen out/Debug --args="import(\"//electron/build/args/electron_debug.gn\") $GN_EXTRA_ARGS"
 ```
 
 **For generating Release (aka "non-component" or "static") build config of

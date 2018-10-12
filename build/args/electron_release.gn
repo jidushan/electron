@@ -1,4 +1,5 @@
-import("all.gn")
+import("electron_base.gni")
+
 is_component_build = false
 is_official_build = true
 strip_debug_info = true

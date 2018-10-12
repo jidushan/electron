@@ -17,13 +17,13 @@ machine-mac: &machine-mac
 
 # Build configurations options.
 env-debug-build: &env-debug-build
-  GN_CONFIG: //electron/build/args/debug.gn
+  GN_CONFIG: //electron/build/args/electron_debug.gn
 
 env-testing-build: &env-testing-build
-  GN_CONFIG: //electron/build/args/testing.gn
+  GN_CONFIG: //electron/build/args/electron_testing.gn
 
 env-release-build: &env-release-build
-  GN_CONFIG: //electron/build/args/release.gn
+  GN_CONFIG: //electron/build/args/electron_release.gn
   STRIP_BINARIES: true
 
 env-headless-testing: &env-headless-testing

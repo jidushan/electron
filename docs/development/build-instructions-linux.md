@@ -114,7 +114,7 @@ GN args.
 For example if you installed `clang` under `/usr/local/bin/clang`:
 
 ```sh
-$ gn gen out/Debug --args='import("//electron/build/args/debug.gn") clang_base_path = "/usr/local/bin"'
+$ gn gen out/Debug --args='import("//electron/build/args/electron_debug.gn") clang_base_path = "/usr/local/bin"'
 ```
 
 ### Using compilers other than `clang`
