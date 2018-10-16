@@ -199,6 +199,22 @@ base::FilePath::StringType NodeBindings::GetHelperResourcesPath() {
   return GetResourcesPath(false).value();
 }
 
+// helper to split up NODE_OPTIONS by whitespace
+std::vector<std::string> split_string(const std::string& s,
+                                      char delimiter = ' ') {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(s);
+  while (std::getline(tokenStream, token, delimiter)) {
+    std::size_t idx = token.find("=");
+    if (idx != std::string::npos)
+      tokens.push_back(token.substr(0, idx));
+    else
+      tokens.push_back(token);
+  }
+  return tokens;
+}
+
 void NodeBindings::Initialize() {
   // Open node's error reporting system for browser process.
   node::g_standalone_mode = browser_env_ == BROWSER;
@@ -213,19 +229,42 @@ void NodeBindings::Initialize() {
   // Explicitly register electron's builtin modules.
   RegisterBuiltinModules();
 
-  // Init node.
-  // (we assume node::Init would not modify the parameters under embedded mode).
-  // NOTE: If you change this line, please ping @codebytere or @MarshallOfSound
+  // pass non-null program name to argv so it doesn't crash
+  // trying to index into a nullptr
   int argc = 0;
   int exec_argc = 0;
-  const char** argv = nullptr;
+  const char* prog_name = "electron";
+  const char** argv = {&prog_name};
   const char** exec_argv = nullptr;
+
+  std::unique_ptr<base::Environment> env(base::Environment::Create());
+  if (env->HasVar("NODE_OPTIONS")) {
+    std::vector<std::string> disallowed = {
+        "--inspect", "--inspect-brk",    "--inspect-port", "--require",
+        "-r",        "--openssl-config", "--loader",       "--use-openssl-ca"};
+
+    std::string options;
+    env->GetVar("NODE_OPTIONS", &options);
+    std::vector<std::string> parts = split_string(options);
+
+    for (std::string part : parts) {
+      bool is_allowed = std::find(disallowed.begin(), disallowed.end(), part) !=
+                        disallowed.end();
+      if (std::find(disallowed.begin(), disallowed.end(), part) !=
+          disallowed.end()) {
+        printf("This NODE_OPTION is not allowed in Electron");
+      }
+    }
+  }
+
+  // TODO(codebytere): this is going to be deprecated in the near future
+  // in favor of Init(std::vector<std::string>* argv,
+  //        std::vector<std::string>* exec_argv)
   node::Init(&argc, argv, &exec_argc, &exec_argv);
 
 #if defined(OS_WIN)
   // uv_init overrides error mode to suppress the default crash dialog, bring
   // it back if user wants to show it.
-  std::unique_ptr<base::Environment> env(base::Environment::Create());
   if (browser_env_ == BROWSER || env->HasVar("ELECTRON_DEFAULT_ERROR_MODE"))
     SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
 #endif
