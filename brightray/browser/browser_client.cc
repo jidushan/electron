@@ -10,8 +10,6 @@
 #include "brightray/browser/browser_main_parts.h"
 #include "brightray/browser/devtools_manager_delegate.h"
 #include "brightray/browser/media/media_capture_devices_dispatcher.h"
-#include "brightray/browser/notification_presenter.h"
-#include "brightray/browser/platform_notification_service.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/common/url_constants.h"
 
@@ -65,14 +63,6 @@ void BrowserClient::WebNotificationAllowed(
   callback.Run(false, true);
 }
 
-NotificationPresenter* BrowserClient::GetNotificationPresenter() {
-  if (!notification_presenter_) {
-    // Create a new presenter if on OS X, Linux, or Windows 7+
-    notification_presenter_.reset(NotificationPresenter::Create());
-  }
-  return notification_presenter_.get();
-}
-
 BrowserMainParts* BrowserClient::OverrideCreateBrowserMainParts(
     const content::MainFunctionParams&) {
   return new BrowserMainParts;
@@ -87,13 +77,6 @@ content::BrowserMainParts* BrowserClient::CreateBrowserMainParts(
 
 content::MediaObserver* BrowserClient::GetMediaObserver() {
   return MediaCaptureDevicesDispatcher::GetInstance();
-}
-
-content::PlatformNotificationService*
-BrowserClient::GetPlatformNotificationService() {
-  if (!notification_service_)
-    notification_service_.reset(new PlatformNotificationService(this));
-  return notification_service_.get();
 }
 
 void BrowserClient::GetAdditionalAllowedSchemesForFileSystem(
